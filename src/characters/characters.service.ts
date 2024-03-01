@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
 import axios from 'axios';
@@ -17,17 +17,22 @@ export class CharactersService {
     return 'aqui é a criação de personagens';
   }
 
-  async findAll(){
+  async findAll(page: number){
     try {
-      const response = await axios.get(`${this.baseUrl}/character`);
+      const response = await axios.get(`${this.baseUrl}/character/?page=${page}`);
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} character`;
+ async findOne(id: number) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/character/${id}`);
+      return response.data;
+    } catch (error) {
+      throw new NotFoundException(`Character with ID ${id} not found.`);
+    }
   }
 
   update(id: number, updateCharacterDto: UpdateCharacterDto) {
